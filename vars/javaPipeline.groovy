@@ -51,8 +51,8 @@ def call(Map config) {
                       // Run Kaniko in a Kubernetes pod
   
                               sh """
-                              /kaniko/executor --context ${appName} \
-                              --dockerfile ${appName}/Dockerfile \
+                              /kaniko/executor --context ${BASE_PATH}/${appName}_$(GIT_BRANCH} \
+                              --dockerfile ${BASE_PATH}/${appName}_$(GIT_BRANCH}/Dockerfile \
                               --destination ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
                                """
                    }
