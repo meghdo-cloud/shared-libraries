@@ -2,7 +2,7 @@
 
 def call(Map config) {
 
-  setupAndValidateParameter(config)
+  setupAndValidateParameters(config)
 
   pipeline {
       agent { label 'javaagent' }
