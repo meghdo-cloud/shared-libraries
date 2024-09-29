@@ -53,7 +53,7 @@ def call(Map config) {
                               sh """
                               /kaniko/executor --context ${appName} \
                               --dockerfile ${appName}/Dockerfile \
-                              --destination ${dockerRegistry}/${projectId}//${REPO_NAME}/${appName}:${TAG}
+                              --destination ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
                                """
                    }
                }
@@ -72,7 +72,7 @@ def call(Map config) {
                       gcloud container clusters get-credentials ${clusterName} --zone ${clusterRegion}
                       helm upgrade --install ${appName} ${CHART_PATH} \
                       --namespace ${namespace} \
-                      --set image.repository=${dockerRegistry}/${projectId}//${REPO_NAME}/${appName} \
+                      --set image.repository=${dockerRegistry}/${projectId}/${REPO_NAME}/${appName} \
                       --set image.tag=${TAG}
                       """
                   }
