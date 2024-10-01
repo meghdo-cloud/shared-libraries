@@ -22,7 +22,7 @@ def call(Map config) {
                           skipStages = true
                           currentBuild.description = "SCM Skip - Build skipped as no new commits in branch"
                       }
-                      echo Boolean.toString(skipStages)
+                      sh "echo ${skipStages}"
                   }
               }    
           }   
