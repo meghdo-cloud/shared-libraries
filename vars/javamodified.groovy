@@ -78,15 +78,10 @@ def call(Map config) {
                     }
                 }
             }
-            stage('Cleanup') {
-                steps {
-                    cleanWs()
-                }
-            }
         }
         post {
             always {
-                node(POD_LABEL) {
+                script {
                     cleanWs()
                 }
             }
