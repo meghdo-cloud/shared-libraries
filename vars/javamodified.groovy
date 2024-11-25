@@ -88,7 +88,7 @@ def call(Map config) {
         }            
     }
 }
-
+}
 def setupAndValidateParameters(Map config) {
     projectId = config.projectId
     clusterName = config.clusterName
