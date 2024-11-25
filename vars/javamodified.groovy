@@ -66,6 +66,7 @@ def call(Map config) {
                 }              
                 steps {
                     script {
+                       container('infra-tools') {  
                         sh """
                         gcloud config set project ${projectId}
                         gcloud container clusters get-credentials ${clusterName} --zone ${clusterRegion}
