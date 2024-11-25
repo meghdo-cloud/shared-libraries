@@ -36,9 +36,11 @@ def call(Map config) {
                 }    
                 steps {
                     script {
+                       container('maven') { 
                         sh 'pwd'
                         sh 'ls -lrt'
                         sh 'mvn clean package -DskipTests'
+                       }    
                     }
                 }
             }
