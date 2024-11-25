@@ -87,7 +87,9 @@ def call(Map config) {
       post {
           always {
               script {
-                  cleanWs()
+                  container('jnlp') {
+                    cleanWs()
+                }
               }
           }  
       }            
