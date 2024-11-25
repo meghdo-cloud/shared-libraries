@@ -1,15 +1,13 @@
-!groovy
-
 def call(Map config) {
     setupAndValidateParameters(config)
 
     pipeline {
-        agent { 
-            kubernetes { 
+        agent {
+            kubernetes {
                 label 'meghdo-java'
                 yamlFile "pipeline/pod.yaml"
             }
-        }  
+        }
         environment {
             CHART_PATH = './helm-charts'
             BASE_PATH = '/home/jenkins/agent/workspace'
@@ -28,26 +26,26 @@ def call(Map config) {
                         }
                         sh "echo ${skipStages}"
                     }
-                }    
-            }   
-            stage('Maven Build') {    
+                }
+            }
+            stage('Maven Build') {
                 when {
                     expression { return !skipStages }
-                }    
+                }
                 steps {
                     script {
-                       container('maven') { 
-                        sh 'pwd'
-                        sh 'ls -lrt'
-                        sh 'mvn clean package -DskipTests'
-                       }    
+                        container('maven') {
+                            sh 'pwd'
+                            sh 'ls -lrt'
+                            sh 'mvn clean package -DskipTests'
+                        }
                     }
                 }
             }
             stage('Kaniko Build & Push') {
                 when {
                     expression { return !skipStages }
-                }              
+                }
                 steps {
                     script {
                         container(name: 'kaniko', shell: '/busybox/sh') {
@@ -58,23 +56,24 @@ def call(Map config) {
                             """
                         }
                     }
-                }      
+                }
             }
             stage('Deploy with Helm') {
                 when {
                     expression { return !skipStages }
-                }              
+                }
                 steps {
                     script {
-                       container('infra-tools') {  
-                        sh """
-                        gcloud config set project ${projectId}
-                        gcloud container clusters get-credentials ${clusterName} --zone ${clusterRegion}
-                        helm upgrade --install ${appName} ${CHART_PATH} \
-                        --namespace ${namespace} \
-                        --set image.repository=${dockerRegistry}/${projectId}/${REPO_NAME}/${appName} \
-                        --set image.tag=${TAG}
-                        """
+                        container('infra-tools') {
+                            sh """
+                            gcloud config set project ${projectId}
+                            gcloud container clusters get-credentials ${clusterName} --zone ${clusterRegion}
+                            helm upgrade --install ${appName} ${CHART_PATH} \
+                            --namespace ${namespace} \
+                            --set image.repository=${dockerRegistry}/${projectId}/${REPO_NAME}/${appName} \
+                            --set image.tag=${TAG}
+                            """
+                        }
                     }
                 }
             }
@@ -85,10 +84,10 @@ def call(Map config) {
                     cleanWs()
                 }
             }
-        }            
+        }
     }
 }
-}
+
 def setupAndValidateParameters(Map config) {
     projectId = config.projectId
     clusterName = config.clusterName
