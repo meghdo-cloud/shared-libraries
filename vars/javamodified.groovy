@@ -5,7 +5,12 @@ def call(Map config) {
   setupAndValidateParameters(config)
 
   pipeline {
-      agent { label 'javaagent' }
+      agent { 
+           kubernetes { 
+              label 'meghdo-java'
+              yamlFile "pipeline/pod.yaml"
+           }
+      }  
       environment {
           CHART_PATH = './helm-charts'   // Set the path to your Helm chart
           BASE_PATH = '/home/jenkins/agent/workspace'
