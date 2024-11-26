@@ -125,14 +125,14 @@ def publishSecurityReports() {
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: '.',
-            reportFiles: 'semgrep-results.json,snyk-results.json',
+            reportFiles: 'semgrep-results.json',
             reportName: 'Security Scan Reports'
     ])
 }
 
 def sendSecurityFailureNotification() {
     // Customize notification based on your communication tools
-    mail to: 'security-team@company.com',
+    mail to: 'raman.aparna@gmail.com',
             subject: "Security Scan Failed: ${currentBuild.fullDisplayName}",
             body: """
          Security quality gates were not met.
