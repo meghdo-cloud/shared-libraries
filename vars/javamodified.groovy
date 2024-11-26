@@ -66,8 +66,8 @@ def call(Map config) {
                         def reportFileName = "${appName}-${TAG}.json"
                         sh """                        
                         trivy image --cache-dir /tmp --severity HIGH,CRITICAL  --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
-                        env.REPORT_FILE = reportFileName
                         """
+                        env.REPORT_FILE = reportFileName
                         }
                     container('infra-tools') {
                         sh """                        
