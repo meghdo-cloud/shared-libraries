@@ -28,27 +28,6 @@ def call(Map config) {
                     }
                 }
             }
-            stage('Static Code Analysis') {
-                steps {
-                    container('semgrep') {
-                        script {
-                            // Semgrep Code Scanning
-                            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                                sh '''
-                                    semgrep \
-                                    --config=auto \
-                                    --json --output semgrep-results.json \
-                                    --metrics=off
-                                '''
-
-                                // Parse and evaluate Semgrep results
-                                def semgrepResults = readJSON file: 'semgrep-results.json'
-                                evaluateCodeQualityGate(semgrepResults)
-                             }
-                          }
-                    }
-                }
-            }
             stage('Maven Build') {
                 when {
                     expression { return !skipStages }
@@ -79,6 +58,24 @@ def call(Map config) {
                     }
                 }
             }
+            stage('Container scanning') {
+            steps {
+                script {
+                    container(name: 'trivy') {
+                        sh """
+                        def reportFileName = "${appName}-${TAG}.json"
+                        trivy image --severity HIGH,CRITICAL --exit-code 1 --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
+                        env.REPORT_FILE = reportFileName
+                        """
+                        }
+                     container('infra-tools') {
+                            sh """
+                            gsutil cp ${env.REPORT_FILE} gs://${GCS_BUCKET}/${appName}/${env.REPORT_FILE}
+                            """
+                        }
+                    }
+                }
+            }    
             stage('Deploy with Helm') {
                 when {
                     expression { return !skipStages }
