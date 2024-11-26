@@ -43,7 +43,7 @@ def call(Map config) {
                     }
                 }
             }
-            stage('Kaniko Build & Push') {
+            stage('Kaniko Image Build & Push') {
                 when {
                     expression { return !skipStages }
                 }
@@ -59,7 +59,7 @@ def call(Map config) {
                     }
                 }
             }
-            stage('Container scanning') {
+            stage('Image scanning') {
             steps {
                 script {
                     container('trivy') {
