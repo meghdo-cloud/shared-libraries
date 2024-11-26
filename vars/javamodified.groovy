@@ -100,20 +100,9 @@ def call(Map config) {
         post {
             always {
                 script {
-                    // Security Scan Reporting
-                    archiveArtifacts artifacts: '*-results.json,*-report.json', allowEmptyArchive: true
-
-                    // Generate Security Reports
-                    publishSecurityReports()
                     cleanWs()
                 }
             }
-          failure {
-                // Security Failure Notifications
-                script {
-                    sendSecurityFailureNotification()
-                }
-            }  
         }
     }
 }
