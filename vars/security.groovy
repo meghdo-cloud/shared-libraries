@@ -125,7 +125,7 @@ def publishSecurityReports() {
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: '.',
-            reportFiles: 'semgrep-results.json,snyk-results.json,trivy-results.json',
+            reportFiles: 'semgrep-results.json,snyk-results.json',
             reportName: 'Security Scan Reports'
     ])
 }
