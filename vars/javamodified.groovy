@@ -65,7 +65,7 @@ def call(Map config) {
                     container('trivy') {
                         def reportFileName = "${appName}-${TAG}.json"
                         sh """                        
-                        trivy image --severity HIGH,CRITICAL --exit-code 1 --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
+                        trivy image --cache-dir /tmp --severity HIGH,CRITICAL --exit-code 1 --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
                         env.REPORT_FILE = reportFileName
                         """
                         }
