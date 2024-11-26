@@ -13,6 +13,7 @@ def call(Map config) {
             BASE_PATH = '/home/jenkins/agent/workspace'
             TAG = "${GIT_BRANCH}-${GIT_COMMIT[0..5]}"
             REPO_NAME = 'docker-repo'
+            TRIVY_GCS = "trivy-meghdo-4567"
         }
         stages {
             stage('SCM Skip') {
@@ -70,7 +71,7 @@ def call(Map config) {
                         }
                      container('infra-tools') {
                             sh """
-                            gsutil cp ${env.REPORT_FILE} gs://${GCS_BUCKET}/${appName}/${env.REPORT_FILE}
+                            gsutil cp ${env.REPORT_FILE} gs://${TRIVY_GCS}/${appName}/${env.REPORT_FILE}
                             """
                         }
                     }
