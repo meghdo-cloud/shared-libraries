@@ -4,7 +4,7 @@ def call(Map config) {
     pipeline {
         agent {
             kubernetes {
-                label 'meghdo-java'
+                label 'java17'
                 yamlFile "pipeline/pod.yaml"
             }
         }
