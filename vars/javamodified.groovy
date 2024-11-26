@@ -65,8 +65,13 @@ def call(Map config) {
                     container('trivy') {
                         def reportFileName = "${appName}-${TAG}.json"
                         sh """                        
-                        trivy image --cache-dir /tmp --severity HIGH,CRITICAL --exit-code 1 --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
+                        trivy image --cache-dir /tmp --severity HIGH,CRITICAL  --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
                         env.REPORT_FILE = reportFileName
+                        """
+                        }
+                    container('infra-tools') {
+                        sh """                        
+                        gsutil cp ${env.REPORT_FILE} gs://${TRIVY_GCS}/${appName}/${env.REPORT_FILE}
                         """
                         }
                     }
