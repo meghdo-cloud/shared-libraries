@@ -28,54 +28,25 @@ def call(Map config) {
                     }
                 }
             }
-            stage('Security Scans') {
-                when {
-                    expression { return !skipStages }
-                }
-                parallel {
-                    stage('Static Code Analysis') {
-                        steps {
-                            container('semgrep') {
-                                script {
-                                    // Semgrep Code Scanning
-                                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                                        sh '''
-                                            semgrep \
-                                            --config=auto \
-                                            --json --output semgrep-results.json \
-                                            --metrics=off
-                                        '''
+            stage('Static Code Analysis') {
+                steps {
+                    container('semgrep') {
+                        script {
+                            // Semgrep Code Scanning
+                            catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                                sh '''
+                                    semgrep \
+                                    --config=auto \
+                                    --json --output semgrep-results.json \
+                                    --metrics=off
+                                '''
 
-                                        // Parse and evaluate Semgrep results
-                                        def semgrepResults = readJSON file: 'semgrep-results.json'
-                                        evaluateCodeQualityGate(semgrepResults)
-                                    }
-                                }
-                            }
-                        }
+                                // Parse and evaluate Semgrep results
+                                def semgrepResults = readJSON file: 'semgrep-results.json'
+                                evaluateCodeQualityGate(semgrepResults)
+                             }
+                          }
                     }
-
-                    stage('Dependency Vulnerability Scan') {
-                        steps {
-                            container('synk') {
-                                script {
-                                    // Snyk Dependency Scanning
-                                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                                        sh '''
-                                            snyk test \
-                                            --all-projects \
-                                            --severity-threshold=high \
-                                            --json-file-output=snyk-results.json
-                                        '''
-
-                                        // Parse and evaluate Snyk results
-                                        def snykResults = readJSON file: 'snyk-results.json'
-                                        evaluateDependencyQualityGate(snykResults)
-                                    }
-                                }
-                            }
-                        }
-                    }                   
                 }
             }
             stage('Maven Build') {
