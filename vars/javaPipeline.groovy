@@ -64,14 +64,10 @@ def call(Map config) {
                 }
                 steps {
                     script {
-                        container('gcloud') {
+                        container('infra-tools') {
                             sh """
                             gcloud config set project ${projectId}
                             gcloud container clusters get-credentials ${clusterName} --zone ${clusterRegion}
-                            """
-                        }
-                        container('helm') {
-                            sh """
                             helm upgrade --install ${appName} ${CHART_PATH} \
                             --namespace ${namespace} \
                             --set image.repository=${dockerRegistry}/${projectId}/${REPO_NAME}/${appName} \
