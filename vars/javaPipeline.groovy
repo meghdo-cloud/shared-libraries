@@ -71,6 +71,7 @@ def call(Map config) {
                             """
                         }
                         container('helm') {
+                            sh """
                             helm upgrade --install ${appName} ${CHART_PATH} \
                             --namespace ${namespace} \
                             --set image.repository=${dockerRegistry}/${projectId}/${REPO_NAME}/${appName} \
