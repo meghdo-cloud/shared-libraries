@@ -62,17 +62,12 @@ def call(Map config) {
             stage('Container scanning') {
             steps {
                 script {
-                    container(name: 'trivy') {
+                    container('trivy') {
                         sh """
                         def reportFileName = "${appName}-${TAG}.json"
                         trivy image --severity HIGH,CRITICAL --exit-code 1 --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
                         env.REPORT_FILE = reportFileName
                         """
-                        }
-                     container('infra-tools') {
-                            sh """
-                            gsutil cp ${env.REPORT_FILE} gs://${TRIVY_GCS}/${appName}/${env.REPORT_FILE}
-                            """
                         }
                     }
                 }
