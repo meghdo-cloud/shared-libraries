@@ -31,27 +31,28 @@ def call(Map config) {
                 }
             }
             stage('Code N Dependency Scans') {
-            when {
-                expression { return !skipStages }
-            }
-            steps {
-                script {
-                    container('owasp') {
-                        def owaspReport = "${appName}-${TAG}.json"
-                        sh """
-                        dependency-check.sh --project "${appName}" \
-                        --scan "." --format "HTML,JSON" \
-                        --out $owaspReport
-                        """
-                        env.OWASP_FILE = reportFileName
-                      }
-                      container('infra-tools') {
-                        sh """                        
-                        gsutil cp ${env.OWASP_FILE} gs://${OWASP_GCS}/${appName}/${env.OWASP_FILE}
-                        """
-                      } 
+                when {
+                    expression { return !skipStages }
                 }
-            }
+                steps {
+                    script {
+                        container('owasp') {
+                            def owaspReport = "${appName}-${TAG}.json"
+                            sh """
+                            dependency-check.sh --project "${appName}" \
+                            --scan "." --format "HTML,JSON" \
+                            --out $owaspReport
+                            """
+                            env.OWASP_FILE = reportFileName
+                          }
+                          container('infra-tools') {
+                            sh """                        
+                            gsutil cp ${env.OWASP_FILE} gs://${OWASP_GCS}/${appName}/${env.OWASP_FILE}
+                            """
+                          } 
+                      }
+                  }
+            }    
             stage('Maven Build') {
                 when {
                     expression { return !skipStages }
