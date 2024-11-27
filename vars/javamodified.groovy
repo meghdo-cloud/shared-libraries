@@ -32,11 +32,18 @@ def call(Map config) {
             }
             stage('OWASP Scans') {
                 when {
-                    expression { return !skipStages }
+                    expression { return !skipOWASP }
                 }
                 steps {
-                    dependencyCheck odcInstallation: 'dep-check'
-                   
+                    dependencyCheck odcInstallation: 'dep-check', additionalArguments: '--scan src/main --exclude helm-charts --exclude pipeline --disableRetireJS --noupdate ----projectName ${appName}' 
+                    dependencyCheckPublisher pattern: '${appName}-${TAG}.xml'
+                    script {
+                        container('infra-tools') {
+                            sh """                        
+                            gsutil cp ${appName}-${TAG}.xml gs://${OWASP_GCS}/${appName}/${appName}-${TAG}.xml
+                            """
+                          } 
+                      }
                   }
             }    
             stage('Maven Build') {
@@ -122,4 +129,5 @@ def setupAndValidateParameters(Map config) {
     appName = config.appName
     dockerRegistry = config.dockerRegistry
     namespace = config.namespace
+    skipOWASP = config.skipOWASP
 }
