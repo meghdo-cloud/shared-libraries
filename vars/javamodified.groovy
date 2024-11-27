@@ -35,7 +35,7 @@ def call(Map config) {
                     expression { return scanOWASP }
                 }
                 steps {
-                    dependencyCheck odcInstallation: 'dep-check', additionalArguments: '--scan src/main --exclude helm-charts --exclude pipeline --disableRetireJS --noupdate --project ${appName}' 
+                    dependencyCheck odcInstallation: 'dep-check', additionalArguments: '--scan src/main --exclude helm-charts --exclude pipeline --disableRetireJS --project ${appName}' 
                     dependencyCheckPublisher pattern: '${appName}-${TAG}.xml'
                     script {
                         container('infra-tools') {
