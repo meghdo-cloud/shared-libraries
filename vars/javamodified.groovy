@@ -14,6 +14,7 @@ def call(Map config) {
             TAG = "${GIT_BRANCH}-${GIT_COMMIT[0..5]}"
             REPO_NAME = 'docker-repo'
             TRIVY_GCS = "trivy-${projectId}"
+            OWASP_GCS = "owasp-${projectId}"
         }
         stages {
             stage('SCM Skip') {
@@ -29,6 +30,28 @@ def call(Map config) {
                     }
                 }
             }
+            stage('Code N Dependency Scans') {
+            when {
+                expression { return !skipStages }
+            }
+            steps {
+                script {
+                    container('owasp') {
+                        def owaspReport = "${appName}-${TAG}.json"
+                        sh """
+                        dependency-check.sh --project "${appName}" \
+                        --scan "." --format "HTML,JSON" \
+                        --out $owaspReport
+                        """
+                        env.OWASP_FILE = reportFileName
+                      }
+                      container('infra-tools') {
+                        sh """                        
+                        gsutil cp ${env.OWASP_FILE} gs://${OWASP_GCS}/${appName}/${env.OWASP_FILE}
+                        """
+                      } 
+                }
+            }
             stage('Maven Build') {
                 when {
                     expression { return !skipStages }
@@ -36,8 +59,6 @@ def call(Map config) {
                 steps {
                     script {
                         container('maven') {
-                            sh 'pwd'
-                            sh 'ls -lrt'
                             sh 'mvn clean package -DskipTests'
                         }
                     }
@@ -67,11 +88,11 @@ def call(Map config) {
                         sh """                        
                         trivy image --cache-dir /tmp --severity HIGH,CRITICAL  --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
                         """
-                        env.REPORT_FILE = reportFileName
+                        env.TRIVY_FILE = reportFileName
                         }
                     container('infra-tools') {
                         sh """                        
-                        gsutil cp ${env.REPORT_FILE} gs://${TRIVY_GCS}/${appName}/${env.REPORT_FILE}
+                        gsutil cp ${env.TRIVY_FILE} gs://${TRIVY_GCS}/${appName}/${env.TRIVY_FILE}
                         """
                         }
                     }
