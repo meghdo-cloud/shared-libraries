@@ -30,28 +30,13 @@ def call(Map config) {
                     }
                 }
             }
-            stage('Code N Dependency Scans') {
+            stage('OWASP Scans') {
                 when {
                     expression { return !skipStages }
                 }
                 steps {
-                    script {
-                        container('owasp') {
-                            def owaspReport = "${appName}-${TAG}.json"
-                            sh """
-                            pwd
-                            /usr/share/dependency-check/bin/dependency-check.sh --project "${appName}" \
-                            --scan "." --format "JSON" \
-                            --out $owaspReport
-                            """
-                            env.OWASP_FILE = reportFileName
-                          }
-                          container('infra-tools') {
-                            sh """                        
-                            gsutil cp ${env.OWASP_FILE} gs://${OWASP_GCS}/${appName}/${env.OWASP_FILE}
-                            """
-                          } 
-                      }
+                    depdencyCheck additionalArguments: '', odcInstallation: 'dep-check'
+                    dependencyCheckPublisher pattern: '**/${appName}-${TAG}.json'                    
                   }
             }    
             stage('Maven Build') {
