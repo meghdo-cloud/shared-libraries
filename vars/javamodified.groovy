@@ -39,6 +39,7 @@ def call(Map config) {
                         container('owasp') {
                             def owaspReport = "${appName}-${TAG}.json"
                             sh """
+                            pwd
                             /opt/dependency-check/bin/dependency-check.sh --project "${appName}" \
                             --scan "." --format "HTML,JSON" \
                             --out $owaspReport
