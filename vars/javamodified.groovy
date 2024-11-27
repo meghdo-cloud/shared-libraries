@@ -40,7 +40,7 @@ def call(Map config) {
                     script {
                         container('infra-tools') {
                             sh """                        
-                            gsutil cp ${appName}-${TAG}.xml gs://${OWASP_GCS}/${appName}/${appName}-${TAG}.xml
+                            gsutil cp ./dependency-check-report.xml gs://${OWASP_GCS}/${appName}/${appName}-${TAG}.xml
                             """
                           } 
                       }
