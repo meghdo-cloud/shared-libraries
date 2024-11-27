@@ -32,7 +32,7 @@ def call(Map config) {
             }
             stage('OWASP Scans') {
                 when {
-                    expression { return !skipOWASP }
+                    expression { return scanOWASP }
                 }
                 steps {
                     dependencyCheck odcInstallation: 'dep-check', additionalArguments: '--scan src/main --exclude helm-charts --exclude pipeline --disableRetireJS --noupdate ----projectName ${appName}' 
@@ -129,5 +129,5 @@ def setupAndValidateParameters(Map config) {
     appName = config.appName
     dockerRegistry = config.dockerRegistry
     namespace = config.namespace
-    skipOWASP = config.skipOWASP
+    scanOWASP = config.scanOWASP
 }
