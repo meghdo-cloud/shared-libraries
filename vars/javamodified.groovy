@@ -41,7 +41,7 @@ def call(Map config) {
                             sh """
                             pwd
                             /usr/share/dependency-check/bin/dependency-check.sh --project "${appName}" \
-                            --scan "." --format "HTML,JSON" \
+                            --scan "." --format "JSON" \
                             --out $owaspReport
                             """
                             env.OWASP_FILE = reportFileName
