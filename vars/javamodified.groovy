@@ -35,8 +35,8 @@ def call(Map config) {
                     expression { return !skipStages }
                 }
                 steps {
-                    dependencyCheck additionalArguments: '', odcInstallation: 'dep-check'
-                    dependencyCheckPublisher pattern: '**/${appName}-${TAG}.json'                    
+                    dependencyCheck odcInstallation: 'dep-check'
+                   
                   }
             }    
             stage('Maven Build') {
