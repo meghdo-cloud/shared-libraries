@@ -13,6 +13,8 @@ def call(Map config) {
             BASE_PATH = '/home/jenkins/agent/workspace'
             TAG = "${GIT_BRANCH}-${GIT_COMMIT[0..5]}"
             REPO_NAME = 'docker-repo'
+            TRIVY_GCS = "trivy-${projectId}"
+            OWASP_GCS = "owasp-${projectId}"
         }
         stages {
             stage('SCM Skip') {
@@ -28,6 +30,22 @@ def call(Map config) {
                     }
                 }
             }
+            stage('OWASP Scans') {
+                when {
+                    expression { return scanOWASP }
+                }
+                steps {
+                    dependencyCheck odcInstallation: 'dep-check', additionalArguments: '--scan src/main --exclude helm-charts --exclude pipeline --disableRetireJS --project ${appName}' 
+                    
+                    script {
+                        container('infra-tools') {
+                            sh """                        
+                            gsutil cp ./dependency-check-report.xml gs://${OWASP_GCS}/${appName}/${appName}-${TAG}.xml
+                            """
+                          } 
+                      }
+                  }
+            }    
             stage('Maven Build') {
                 when {
                     expression { return !skipStages }
@@ -35,14 +53,12 @@ def call(Map config) {
                 steps {
                     script {
                         container('maven') {
-                            sh 'pwd'
-                            sh 'ls -lrt'
                             sh 'mvn clean package -DskipTests'
                         }
                     }
                 }
             }
-            stage('Kaniko Build & Push') {
+            stage('Kaniko Image Build & Push') {
                 when {
                     expression { return !skipStages }
                 }
@@ -58,6 +74,24 @@ def call(Map config) {
                     }
                 }
             }
+            stage('Image scanning') {
+            steps {
+                script {
+                    container('trivy') {
+                        def reportFileName = "${appName}-${TAG}.json"
+                        sh """                        
+                        trivy image --cache-dir /tmp --severity HIGH,CRITICAL  --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
+                        """
+                        env.TRIVY_FILE = reportFileName
+                        }
+                    container('infra-tools') {
+                        sh """                        
+                        gsutil cp ${env.TRIVY_FILE} gs://${TRIVY_GCS}/${appName}/${env.TRIVY_FILE}
+                        """
+                        }
+                    }
+                }
+            }    
             stage('Deploy with Helm') {
                 when {
                     expression { return !skipStages }
@@ -95,4 +129,5 @@ def setupAndValidateParameters(Map config) {
     appName = config.appName
     dockerRegistry = config.dockerRegistry
     namespace = config.namespace
+    scanOWASP = config.scanOWASP
 }
