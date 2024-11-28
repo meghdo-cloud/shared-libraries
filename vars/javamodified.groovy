@@ -30,6 +30,24 @@ def call(Map config) {
                     }
                 }
             }
+            stage('SAST Code Scanning') {
+            steps {
+                script {
+                    container('semgrep') {
+                        def semgrepFile = "semgrep-${appName}-${TAG}.json"
+                        sh """                        
+                        semgrep scan --config=auto --json  --metrics=off --output=${semgrepFile}
+                        """
+                        env.SEMGREP_FILE = semgrepFile
+                        }
+                    container('infra-tools') {
+                        sh """                        
+                        gsutil cp ${env.SEMGREP_FILE} gs://${TRIVY_GCS}/${appName}/${TAG}/${env.SEMGREP_FILE}
+                        """
+                        }
+                    }
+                }
+            }    
             stage('OWASP Scans') {
                 when {
                     expression { return scanOWASP }
