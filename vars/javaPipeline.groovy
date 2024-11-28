@@ -13,8 +13,7 @@ def call(Map config) {
             BASE_PATH = '/home/jenkins/agent/workspace'
             TAG = "${GIT_BRANCH}-${GIT_COMMIT[0..5]}"
             REPO_NAME = 'docker-repo'
-            TRIVY_GCS = "trivy-${projectId}"
-            OWASP_GCS = "owasp-${projectId}"
+            GCS_BUCKET = "trivy-${projectId}"
         }
         stages {
             stage('SCM Skip') {
@@ -40,7 +39,7 @@ def call(Map config) {
                     script {
                         container('infra-tools') {
                             sh """                        
-                            gsutil cp ./dependency-check-report.xml gs://${OWASP_GCS}/${appName}/${appName}-${TAG}.xml
+                            gsutil cp ./dependency-check-report.xml gs://${GCS_BUCKET}/${appName}/${TAG}/owasp-${appName}-${TAG}.xml
                             """
                           } 
                       }
@@ -78,7 +77,7 @@ def call(Map config) {
             steps {
                 script {
                     container('trivy') {
-                        def reportFileName = "${appName}-${TAG}.json"
+                        def reportFileName = "trivy-${appName}-${TAG}.json"
                         sh """                        
                         trivy image --cache-dir /tmp --severity HIGH,CRITICAL  --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
                         """
@@ -86,7 +85,7 @@ def call(Map config) {
                         }
                     container('infra-tools') {
                         sh """                        
-                        gsutil cp ${env.TRIVY_FILE} gs://${TRIVY_GCS}/${appName}/${env.TRIVY_FILE}
+                        gsutil cp ${env.TRIVY_FILE} gs://${GCS_BUCKET}/${appName}/${TAG}/${env.TRIVY_FILE}
                         """
                         }
                     }
