@@ -17,20 +17,7 @@ def call(Map config) {
             OWASP_GCS = "owasp-${projectId}"
         }
         stages {
-            stage('SCM Skip') {
-                steps {
-                    script {
-                        skipStages = false
-                        scmSkip = sh(script: 'git log -1 --pretty=%B ${GIT_COMMIT}', returnStdout: true).trim()
-                        if (scmSkip.contains("[ci skip]")) {
-                            skipStages = true
-                            currentBuild.description = "SCM Skip - Build skipped as no new commits in branch"
-                        }
-                        sh "echo ${skipStages}"
-                    }
-                }
-            }
-            stage('SAST Code Scanning') {
+           stage('SAST Code Scanning') {
             steps {
                 script {
                     container('semgrep') {
@@ -48,87 +35,6 @@ def call(Map config) {
                     }
                 }
             }    
-            stage('OWASP Scans') {
-                when {
-                    expression { return scanOWASP == "true" }
-                }
-                steps {
-                    dependencyCheck odcInstallation: 'dep-check', additionalArguments: '--scan src/main --exclude helm-charts --exclude pipeline --disableRetireJS --project ${appName}' 
-                    
-                    script {
-                        container('infra-tools') {
-                            sh """                        
-                            gsutil cp ./dependency-check-report.xml gs://${OWASP_GCS}/${appName}/${appName}-${TAG}.xml
-                            """
-                          } 
-                      }
-                  }
-            }    
-            stage('Maven Build') {
-                when {
-                    expression { return !skipStages }
-                }
-                steps {
-                    script {
-                        container('maven') {
-                            sh 'mvn clean package -DskipTests'
-                        }
-                    }
-                }
-            }
-            stage('Kaniko Image Build & Push') {
-                when {
-                    expression { return !skipStages }
-                }
-                steps {
-                    script {
-                        container(name: 'kaniko', shell: '/busybox/sh') {
-                            sh """
-                            /kaniko/executor --context "${BASE_PATH}/${appName}_${GIT_BRANCH}" \
-                            --dockerfile "${BASE_PATH}/${appName}_${GIT_BRANCH}/Dockerfile" \
-                            --destination ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
-                            """
-                        }
-                    }
-                }
-            }
-            stage('Image scanning') {
-            steps {
-                script {
-                    container('trivy') {
-                        def reportFileName = "${appName}-${TAG}.json"
-                        sh """                        
-                        trivy image --cache-dir /tmp --severity HIGH,CRITICAL  --format json --output ${reportFileName} ${dockerRegistry}/${projectId}/${REPO_NAME}/${appName}:${TAG}
-                        """
-                        env.TRIVY_FILE = reportFileName
-                        }
-                    container('infra-tools') {
-                        sh """                        
-                        gsutil cp ${env.TRIVY_FILE} gs://${TRIVY_GCS}/${appName}/${env.TRIVY_FILE}
-                        """
-                        }
-                    }
-                }
-            }    
-            stage('Deploy with Helm') {
-                when {
-                    expression { return !skipStages }
-                }
-                steps {
-                    script {
-                        container('infra-tools') {
-                            sh """
-                            gcloud config set project ${projectId}
-                            gcloud container clusters get-credentials ${clusterName} --zone ${clusterRegion}
-                            helm upgrade --install ${appName} ${CHART_PATH} \
-                            --namespace ${namespace} \
-                            --set image.repository=${dockerRegistry}/${projectId}/${REPO_NAME}/${appName} \
-                            --set image.tag=${TAG}
-                            """
-                        }
-                    }
-                }
-            }
         }
         post {
             always {
