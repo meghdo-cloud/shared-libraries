@@ -50,7 +50,7 @@ def call(Map config) {
             }    
             stage('OWASP Scans') {
                 when {
-                    expression { return scanOWASP }
+                    expression { return scanOWASP == "true" }
                 }
                 steps {
                     dependencyCheck odcInstallation: 'dep-check', additionalArguments: '--scan src/main --exclude helm-charts --exclude pipeline --disableRetireJS --project ${appName}' 
