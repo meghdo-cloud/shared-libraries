@@ -13,7 +13,7 @@ def call(Map config) {
             BASE_PATH = '/home/jenkins/agent/workspace'
             TAG = "${GIT_BRANCH}-${GIT_COMMIT[0..5]}"
             REPO_NAME = 'docker-repo'
-            GCS_BUCKET = "trivy-${projectId}"
+            GCS_BUCKET = "scans-${projectId}"
         }
         stages {
             stage('SCM Skip') {
