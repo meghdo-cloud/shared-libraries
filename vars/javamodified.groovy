@@ -21,7 +21,7 @@ def call(Map config) {
             steps {
                     snykSecurity(
                       snykInstallation: 'synk-scan',
-                      snykTokenId: '27d11dcf-89e2-46cb-ade0-6dafc6622c45',
+                      snykTokenId: 'aecc0496-5a75-420c-aafb-3db72478b171',
                       additionalArguments: '--all-projects'
                       )
                 }
