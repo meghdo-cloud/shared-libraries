@@ -23,7 +23,7 @@ def call(Map config) {
                     container('semgrep') {
                         def semgrepFile = "semgrep-${appName}-${TAG}.json"
                         sh """                        
-                        semgrep --version
+                        semgrep scan --config=p/ci --json --output=${semgrepFile}
                         sleep 180
                         """
                         env.SEMGREP_FILE = semgrepFile
