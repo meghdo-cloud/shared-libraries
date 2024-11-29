@@ -24,7 +24,6 @@ def call(Map config) {
                         def semgrepFile = "semgrep-${appName}-${TAG}.json"
                         sh """                        
                         semgrep scan --config=p/ci --json --output=${semgrepFile}
-                        sleep 180
                         """
                         env.SEMGREP_FILE = semgrepFile
                         }
