@@ -19,13 +19,11 @@ def call(Map config) {
         stages {
            stage('SAST Code Scanning') {
             steps {
-                steps {
                     snykSecurity(
                       snykInstallation: 'sync-scan',
                       snykTokenId: 'b3f296a1-1750-4031-a3a4-7c0ef3b9fd29',
                       additionalArguments: '--all-projects'
                       )
-                    }
                 }
             }    
         }
