@@ -19,19 +19,12 @@ def call(Map config) {
         stages {
            stage('SAST Code Scanning') {
             steps {
-                script {
-                    container('semgrep') {
-                        def semgrepFile = "semgrep-${appName}-${TAG}.json"
-                        sh """                        
-                        semgrep scan --verbose --config=/etc/semgrep-rules/rules.yaml --include=src/** --json --output=${semgrepFile} --metrics=off
-                        """
-                        env.SEMGREP_FILE = semgrepFile
-                        }
-                    container('infra-tools') {
-                        sh """                        
-                        gsutil cp ${env.SEMGREP_FILE} gs://${TRIVY_GCS}/${appName}/${TAG}/${env.SEMGREP_FILE}
-                        """
-                        }
+                steps {
+                    snykSecurity(
+                      snykInstallation: 'sync-scan',
+                      snykTokenId: 'b3f296a1-1750-4031-a3a4-7c0ef3b9fd29',
+                      additionalArguments: '--all-projects'
+                      )
                     }
                 }
             }    
