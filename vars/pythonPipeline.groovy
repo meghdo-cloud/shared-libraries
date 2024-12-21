@@ -4,7 +4,7 @@ def call(Map config) {
     pipeline {
         agent {
             kubernetes {
-                label 'java17'
+                label 'python'
                 yamlFile "pipeline/pod.yaml"
             }
         }
