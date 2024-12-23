@@ -4,7 +4,7 @@ def call(Map config) {
     pipeline {
         agent {
             kubernetes {
-                label 'python'
+                label 'go'
                 yamlFile "pipeline/pod.yaml"
             }
         }
@@ -56,11 +56,10 @@ def call(Map config) {
                             # Set up Go workspace
                             chmod -R 777 /opt/go
                             export PATH="/usr/local/go/bin:$PATH"
-                            export GOPATH=/opt/go/
-                            
-                            # Change to source directory
-                            cd src                            
-                            # Download dependencies
+                            export GOPATH=/opt/go      
+                            mkdir -p \$GOPATH
+                            chmod -R 777 \$GOPATH
+                            cd src
                             go mod download
                             
                             # Run tests
