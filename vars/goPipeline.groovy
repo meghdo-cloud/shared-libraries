@@ -54,6 +54,7 @@ def call(Map config) {
                         container('golang') {
                             sh """
                             # Set up Go workspace
+                            chmod -R 777 /opt/go
                             export PATH="/usr/local/go/bin:$PATH"
                             export GOPATH=/opt/go/
                             
