@@ -60,10 +60,10 @@ def call(Map config) {
                             # Change to source directory
                             cd src                            
                             # Download dependencies
-                            go mod download
+                            /go/bin/go mod download
                             
                             # Run tests
-                            go test ./...
+                            /go/bin/go test ./...
                             
                             # Build the application
                             CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${BASE_PATH}/${appName}_${GIT_BRANCH}/main .
