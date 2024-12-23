@@ -54,16 +54,16 @@ def call(Map config) {
                         container('golang') {
                             sh """
                             # Set up Go workspace
-                            export GOPATH=/go
-                            export PATH=$PATH:/go/bin
+                            export PATH="/usr/local/go/bin:$PATH"
+                            export GOPATH=/opt/go/
                             
                             # Change to source directory
                             cd src                            
                             # Download dependencies
-                            /go/bin/go mod download
+                            go mod download
                             
                             # Run tests
-                            /go/bin/go test ./...
+                            go test ./...
                             
                             # Build the application
                             CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${BASE_PATH}/${appName}_${GIT_BRANCH}/main .
