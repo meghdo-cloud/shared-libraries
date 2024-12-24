@@ -4,7 +4,7 @@ def call(Map config, Closure buildStage) {
     pipeline {
         agent {
             kubernetes {
-                label ${label}
+                label "${label}"
                 yamlFile "pipeline/pod.yaml"
             }
         }
@@ -45,7 +45,7 @@ def call(Map config, Closure buildStage) {
                       }
                   }
             }    
-            stage("${stage}") {
+            stage('${stage}') {
                 when {
                     expression { return !skipStages }
                 }
