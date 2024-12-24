@@ -54,7 +54,6 @@ def call(Map config) {
                         container('nodejs') {
                             sh """
                             npm install --omit=dev
-                            npm run build
                             """
                         }
                     }
