@@ -55,9 +55,6 @@ def call(Map config) {
                             sh """
                             # Set up Go workspace
                             export PATH="/usr/local/go/bin:$PATH"
-                            export GOPATH=/opt/go      
-                            mkdir -p \$GOPATH
-                            chmod -R 777 \$GOPATH
                             cd src
                             go mod download
                             
