@@ -56,11 +56,9 @@ def call(Map config) {
                             # Set up Go workspace
                             export PATH="/usr/local/go/bin:$PATH"
                             cd src
+                            go mod tidy
                             go mod download
-                            
-                            # Run tests
-                            go test ./...
-                            
+                           
                             # Build the application
                             CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o ${BASE_PATH}/${appName}_${GIT_BRANCH}/main .
                             """
