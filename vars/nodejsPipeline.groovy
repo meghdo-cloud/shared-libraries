@@ -53,18 +53,8 @@ def call(Map config) {
                     script {
                         container('nodejs') {
                             sh """
-                            # Install dependencies
                             npm install --omit=dev
-                            
-                            # Create build directory
-                            mkdir -p ${BASE_PATH}/${appName}_${GIT_BRANCH}/
-                            
-                            # Copy necessary files for production
-                            cp -r src package.json package-lock.json ${BASE_PATH}/${appName}_${GIT_BRANCH}/
-                            
-                            # Install dependencies in the build directory
-                            cd ${BASE_PATH}/${appName}_${GIT_BRANCH}/
-                            npm install --omit=dev --ignore-scripts
+                            npm run build
                             """
                         }
                     }
