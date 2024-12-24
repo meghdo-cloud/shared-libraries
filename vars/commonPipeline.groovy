@@ -45,7 +45,7 @@ def call(Map config, Closure buildStage) {
                       }
                   }
             }    
-            stage("${label}" ' Build') {
+            stage("${stage}") {
                 when {
                     expression { return !skipStages }
                 }
@@ -129,4 +129,5 @@ def setupAndValidateParameters(Map config) {
     namespace = config.namespace
     scanOWASP = config.scanOWASP
     label = config.label ?: 'default'
+    stage = config.label + " Build"
 }
