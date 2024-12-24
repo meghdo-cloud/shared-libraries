@@ -45,7 +45,7 @@ def call(Map config, Closure buildStage) {
                       }
                   }
             }    
-            stage("${label} Build") {
+            stage("${label}" ' Build') {
                 when {
                     expression { return !skipStages }
                 }
