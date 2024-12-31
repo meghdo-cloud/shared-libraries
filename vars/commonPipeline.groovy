@@ -98,7 +98,7 @@ def call(Map config, Closure buildStage) {
                         container('infra-tools') {
                             sh """
                             gcloud config set project ${projectId}
-                            gcloud iam service-accounts add-iam-policy-binding svc-gke@${projectId}.iam.gserviceaccount.com --member="serviceAccount:${projectId}.svc.id.goog[${namespace}/${appName}]" --role="roles/iam.workloadIdentityUser" 
+                            gcloud iam service-accounts add-iam-policy-binding svc-cloudsql@${projectId}.iam.gserviceaccount.com --member="serviceAccount:${projectId}.svc.id.goog[${namespace}/${appName}]" --role="roles/iam.workloadIdentityUser" 
                             gcloud container clusters get-credentials ${clusterName} --zone ${clusterRegion}                            
                             helm upgrade --install ${appName} ${CHART_PATH} \
                             --namespace ${namespace} \
