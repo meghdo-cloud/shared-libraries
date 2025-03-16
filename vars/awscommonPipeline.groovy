@@ -95,7 +95,7 @@ def call(Map config, Closure buildStage) {
                         }
                     container('aws') {
                         sh """                        
-                        aws s3 cp ./dependency-check-report.xml ${AWS_BUCKET}/${appName}/${TAG}/${env.TRIVY_FILE}
+                        aws s3 cp ./${env.TRIVY_FILE} s3://${AWS_BUCKET}/${appName}/${TAG}/${env.TRIVY_FILE}
                         """
                         }
                     }
