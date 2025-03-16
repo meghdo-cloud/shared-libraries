@@ -107,9 +107,13 @@ def call(Map config, Closure buildStage) {
                 }
                 steps {
                     script {
+                        container('aws') {
+                        sh """                        
+                        aws eks update-kubeconfig --name ${config.clusterName} --region ${config.region} }
+                        """
+                        }
                         container('infra-tools') {
-                            sh """
-                            aws eks update-kubeconfig --name ${config.clusterName} --region ${config.region}                        
+                            sh """                                                
                             helm upgrade --install ${appName} ${CHART_PATH} \
                             --namespace ${namespace} \
                             --set image.repository=${dockerRegistry}/${projectId}/${REPO_NAME}/${appName} \
