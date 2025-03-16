@@ -38,7 +38,7 @@ def call(Map config, Closure buildStage) {
                     dependencyCheck odcInstallation: 'dep-check', additionalArguments: '--scan src/main --exclude helm-charts --exclude pipeline --disableRetireJS --project ${appName}' 
                     
                     script {
-                        container('infra-tools') {
+                        container('aws') {
                             sh """                        
                             aws s3 cp ./dependency-check-report.xml ${AWS_BUCKET}/${appName}/owasp-${appName}-${TAG}.xml
                             """
@@ -93,7 +93,7 @@ def call(Map config, Closure buildStage) {
                         """
                         env.TRIVY_FILE = reportFileName
                         }
-                    container('infra-tools') {
+                    container('aws') {
                         sh """                        
                         aws s3 cp ./dependency-check-report.xml ${AWS_BUCKET}/${appName}/${TAG}/${env.TRIVY_FILE}
                         """
