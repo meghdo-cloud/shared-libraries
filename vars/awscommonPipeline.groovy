@@ -124,7 +124,6 @@ def setupAndValidateParameters(Map config) {
     clusterName = config.clusterName
     region = config.region
     appName = config.appName
-    dockerRegistry = config.dockerRegistry
     namespace = config.namespace
     scanOWASP = config.scanOWASP
     label = config.label ?: 'default'
