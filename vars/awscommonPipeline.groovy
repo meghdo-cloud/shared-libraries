@@ -40,7 +40,7 @@ def call(Map config, Closure buildStage) {
                     script {
                         container('aws') {
                             sh """                        
-                            aws s3 cp ./dependency-check-report.xml ${AWS_BUCKET}/${appName}/owasp-${appName}-${TAG}.xml
+                            aws s3 cp ./dependency-check-report.xml s3://${AWS_BUCKET}/${appName}/owasp-${appName}-${TAG}.xml
                             """
                           } 
                       }
