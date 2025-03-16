@@ -116,7 +116,7 @@ def call(Map config, Closure buildStage) {
                             sh """                                                
                             helm upgrade --install ${appName} ${CHART_PATH} \
                             --namespace ${namespace} \
-                            --set image.repository=${dockerRegistry}/${projectId}/${REPO_NAME}/${appName} \
+                            --set image.repository=${DOCKER_REGISTRY}/${REPO_NAME}/${appName} \
                             --set image.tag=${TAG}
                             """
                         }
