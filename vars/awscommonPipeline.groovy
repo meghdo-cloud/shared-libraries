@@ -62,7 +62,7 @@ def call(Map config, Closure buildStage) {
                 }
                 steps {
                     script {
-                        container('infra-tools') {
+                        container('aws') {
                             sh """
                             # Check if repository exists
                             aws ecr describe-repositories --repository-names ${REPO_NAME}/${appName} --region ${region} || {
