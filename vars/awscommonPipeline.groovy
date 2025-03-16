@@ -109,7 +109,7 @@ def call(Map config, Closure buildStage) {
                     script {
                         container('aws') {
                         sh """                        
-                        aws eks update-kubeconfig --name ${config.clusterName} --region ${config.region} }
+                        aws eks update-kubeconfig --name ${config.clusterName} --region ${config.region} 
                         """
                         }
                         container('infra-tools') {
