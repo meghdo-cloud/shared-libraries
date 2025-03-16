@@ -14,6 +14,7 @@ def call(Map config, Closure buildStage) {
             TAG = "${GIT_BRANCH}-${GIT_COMMIT[0..5]}"
             REPO_NAME = 'docker-repo'
             AWS_BUCKET = "scans-${accountName}"
+            DOCKER_REGISTRY="${accountId}.dkr.ecr.${region}.amazonaws.com"
         }
         stages {
             stage('SCM Skip') {
@@ -65,7 +66,7 @@ def call(Map config, Closure buildStage) {
                             sh """
                             /kaniko/executor --context "${BASE_PATH}/${appName}_${GIT_BRANCH}" \
                             --dockerfile "${BASE_PATH}/${appName}_${GIT_BRANCH}/Dockerfile" \
-                            --destination ${accountId}.dkr.ecr.${region}.amazonaws.com/${REPO_NAME}/${appName}:${TAG}
+                            --destination ${DOCKER_REGISTRY}/${REPO_NAME}/${appName}:${TAG}
                             """
                         }
                     }
@@ -77,7 +78,7 @@ def call(Map config, Closure buildStage) {
                     container('trivy') {
                         def reportFileName = "trivy-${appName}-${TAG}.json"
                         sh """                        
-                        trivy image --cache-dir /tmp --severity HIGH,CRITICAL  --format json --output ${reportFileName} ${accountId}.dkr.ecr.${region}.amazonaws.com/${REPO_NAME}/${appName}:${TAG}
+                        trivy image --cache-dir /tmp --severity HIGH,CRITICAL  --format json --output ${reportFileName} ${DOCKER_REGISTRY}/${REPO_NAME}/${appName}:${TAG}
                         """
                         env.TRIVY_FILE = reportFileName
                         }
