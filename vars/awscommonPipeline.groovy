@@ -14,7 +14,7 @@ def call(Map config, Closure buildStage) {
             TAG = "${GIT_BRANCH}-${GIT_COMMIT[0..5]}"
             REPO_NAME = 'docker-repo'
             AWS_BUCKET = "scans-${accountName}"
-            DOCKER_REGISTRY="${accountId}.dkr.ecr.${region}.amazonaws.com"
+            DOCKER_REGISTRY="${config.accountId}.dkr.ecr.${region}.amazonaws.com"
         }
         stages {
             stage('SCM Skip') {
@@ -64,9 +64,10 @@ def call(Map config, Closure buildStage) {
                     script {
                         container(name: 'kaniko', shell: '/busybox/sh') {
                             sh """
+                            echo ${DOCKER_REGISTRY}
                             /kaniko/executor --context "${BASE_PATH}/${appName}_${GIT_BRANCH}" \
                             --dockerfile "${BASE_PATH}/${appName}_${GIT_BRANCH}/Dockerfile" \
-                            --destination ${DOCKER_REGISTRY}/${REPO_NAME}/${appName}:${TAG}
+                            --destination "${DOCKER_REGISTRY}/${REPO_NAME}/${appName}:${TAG}"
                             """
                         }
                     }
