@@ -65,10 +65,10 @@ def call(Map config, Closure buildStage) {
                         container('infra-tools') {
                             sh """
                             # Check if repository exists
-                            aws ecr describe-repositories --repository-names ${REPO_NAME}/${APP_NAME} --region ${REGION} || {
+                            aws ecr describe-repositories --repository-names ${REPO_NAME}/${appName} --region ${region} || {
                                 # Create repository if it doesn't exist
-                                echo "Creating ECR repository ${REPO_NAME}/${APP_NAME}"
-                                aws ecr create-repository --repository-name ${REPO_NAME}/${APP_NAME} --region ${REGION}
+                                echo "Creating ECR repository ${REPO_NAME}/${appName}"
+                                aws ecr create-repository --repository-name ${REPO_NAME}/${appName} --region ${region}
                             }
                             """
                         }
