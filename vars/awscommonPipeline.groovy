@@ -62,6 +62,16 @@ def call(Map config, Closure buildStage) {
                 }
                 steps {
                     script {
+                        container('infra-tools') {
+                            sh """
+                            # Check if repository exists
+                            aws ecr describe-repositories --repository-names ${REPO_NAME}/${APP_NAME} --region ${REGION} || {
+                                # Create repository if it doesn't exist
+                                echo "Creating ECR repository ${REPO_NAME}/${APP_NAME}"
+                                aws ecr create-repository --repository-name ${REPO_NAME}/${APP_NAME} --region ${REGION}
+                            }
+                            """
+                        }
                         container(name: 'kaniko', shell: '/busybox/sh') {
                             sh """
                             echo ${DOCKER_REGISTRY}
