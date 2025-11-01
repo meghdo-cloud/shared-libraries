@@ -81,7 +81,7 @@ def call(Map config, Closure buildStage) {
                         """
                         env.TRIVY_FILE = reportFileName
                         }
-                    container('infra-tools') {
+                    container('gcp') {
                         sh """                        
                         gsutil cp ${env.TRIVY_FILE} gs://${GCS_BUCKET}/${appName}/${TAG}/${env.TRIVY_FILE}
                         """
